@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package metadata.test;
+
+message Container {
+  message Value {
+    string Text = 1 [json_name = "text_value"];
+  }
+
+  message Nested {
+    map<int32, .metadata.test.Container.Value> Values = 1 [json_name = "values_by_id"];
+  }
+
+  map<string, string> Labels = 1 [json_name = "labels"];
+  map<string, .metadata.test.Container.Value> Items = 2 [json_name = "items_by_name"];
+  repeated .metadata.test.Container.Value Rows = 3 [json_name = "rows"];
+  oneof Choice {
+    string First = 5 [json_name = "first_choice"];
+    int32 Second = 6 [json_name = "second_choice"];
+  }
+  optional string DisplayName = 4 [json_name = "display_name"];
+}
+

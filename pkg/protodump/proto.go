@@ -129,18 +129,19 @@ func (pd *ProtoDefinition) writeService(service protoreflect.ServiceDescriptor) 
 func (pd *ProtoDefinition) writeType(field protoreflect.FieldDescriptor) {
 	kind := field.Kind().String()
 
-	if kind == "message" {
-		pd.write(".")
-		pd.write(string(field.Message().FullName()))
-	} else if kind == "enum" {
-		pd.write(".")
-		pd.write(string(field.Enum().FullName()))
-	} else if kind == "map" {
+	// Maps have MessageKind too; inspect map_entry before the message case.
+	if field.IsMap() {
 		pd.write("map<")
 		pd.writeType(field.MapKey())
 		pd.write(", ")
 		pd.writeType(field.MapValue())
 		pd.write(">")
+	} else if kind == "message" {
+		pd.write(".")
+		pd.write(string(field.Message().FullName()))
+	} else if kind == "enum" {
+		pd.write(".")
+		pd.write(string(field.Enum().FullName()))
 	} else {
 		pd.write(kind)
 	}
@@ -169,7 +170,7 @@ func (pd *ProtoDefinition) writeField(field protoreflect.FieldDescriptor) {
 	pd.writeIndented("")
 	if field.HasOptionalKeyword() {
 		pd.write("optional ")
-	} else if field.Cardinality().String() == "repeated" {
+	} else if field.Cardinality().String() == "repeated" && !field.IsMap() {
 		pd.write("repeated ")
 	} else if field.Cardinality().String() == "required" && pd.descriptor.Syntax().String() == "proto2" {
 		pd.write("required ")
@@ -179,8 +180,11 @@ func (pd *ProtoDefinition) writeField(field protoreflect.FieldDescriptor) {
 	pd.write(string(field.Name()))
 	pd.write(" = ")
 	pd.write(strconv.Itoa(int(field.Number())))
+	if field.HasDefault() || field.HasJSONName() {
+		pd.write(" [")
+	}
 	if field.HasDefault() {
-		pd.write(" [default = ")
+		pd.write("default = ")
 		kind := field.Kind().String()
 		if kind == "string" {
 			pd.writeQuoted(field.Default().String())
@@ -191,7 +195,15 @@ func (pd *ProtoDefinition) writeField(field protoreflect.FieldDescriptor) {
 		} else {
 			pd.write(field.Default().String())
 		}
-
+	}
+	if field.HasJSONName() {
+		if field.HasDefault() {
+			pd.write(", ")
+		}
+		pd.write("json_name = ")
+		pd.writeQuoted(field.JSONName())
+	}
+	if field.HasDefault() || field.HasJSONName() {
 		pd.write("]")
 	}
 	pd.write(";\n")
@@ -250,7 +262,11 @@ func (pd *ProtoDefinition) writeMessage(message protoreflect.MessageDescriptor) 
 	}
 
 	for i := 0; i < message.Messages().Len(); i++ {
-		pd.writeMessage(message.Messages().Get(i))
+		nested := message.Messages().Get(i)
+		// Canonical map syntax recreates the synthetic map_entry message.
+		if !nested.IsMapEntry() {
+			pd.writeMessage(nested)
+		}
 	}
 
 	for i := 0; i < message.Enums().Len(); i++ {

@@ -7,7 +7,7 @@ option go_package = "./;escaping";
 
 message M {
   reserved "ev\"il";
-  optional string note = 1 [default = "evil\";\n}\nmessage Injected {\n  string pwned = 1;\n}\n//"];
-  optional bytes blob = 2 [default = "A\377\001hi"];
+  optional string note = 1 [default = "evil\";\n}\nmessage Injected {\n  string pwned = 1;\n}\n//", json_name = "note"];
+  optional bytes blob = 2 [default = "A\377\001hi", json_name = "blob"];
 }
 

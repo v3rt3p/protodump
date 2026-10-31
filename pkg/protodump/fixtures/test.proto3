@@ -23,31 +23,31 @@ message ReservedEnum {
 
 message HelloRequest {
   message Test {
-    string blah = 1;
+    string blah = 1 [json_name = "blah"];
   }
 
   enum NestedEnum {
     BLAH = 0;
   }
 
-  string name = 1;
-  .hello.world.HelloRequest.Test blah = 2;
-  .hello.world.HelloRequest.NestedEnum blahblah = 3;
-  .hello.world.HelloReply blaha = 4;
-  optional string version = 5;
+  string name = 1 [json_name = "name"];
+  .hello.world.HelloRequest.Test blah = 2 [json_name = "blah"];
+  .hello.world.HelloRequest.NestedEnum blahblah = 3 [json_name = "blahblah"];
+  .hello.world.HelloReply blaha = 4 [json_name = "blaha"];
+  optional string version = 5 [json_name = "version"];
 }
 
 message HelloReply {
-  .hello.world.HelloRequest.Test blah = 2;
-  .hello.world.HelloRequest.NestedEnum blahblah = 3;
-  string message = 1;
+  .hello.world.HelloRequest.Test blah = 2 [json_name = "blah"];
+  .hello.world.HelloRequest.NestedEnum blahblah = 3 [json_name = "blahblah"];
+  string message = 1 [json_name = "message"];
 }
 
 message StreamRequest {
-  string message = 1;
+  string message = 1 [json_name = "message"];
 }
 
 message StreamReply {
-  string message = 1;
+  string message = 1 [json_name = "message"];
 }
 

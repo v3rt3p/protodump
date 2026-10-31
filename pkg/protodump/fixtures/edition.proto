@@ -5,8 +5,8 @@ package demo;
 option go_package = "./;editions";
 
 message Sample {
-  int32 id = 1;
-  string name = 2;
-  repeated int32 values = 3;
+  int32 id = 1 [json_name = "id"];
+  string name = 2 [json_name = "name"];
+  repeated int32 values = 3 [json_name = "values"];
 }
 

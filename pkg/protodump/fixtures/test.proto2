@@ -5,11 +5,11 @@ package hello.world;
 option go_package = "./;helloworld";
 
 message SearchRequest {
-  optional string query = 1 [default = "hello"];
-  optional int32 page_number = 2;
-  optional int32 result_per_page = 3 [default = 10];
-  optional .hello.world.Corpus corpus = 4 [default = CORPUS_UNIVERSAL];
-  optional bool field = 5 [default = true];
+  optional string query = 1 [default = "hello", json_name = "query"];
+  optional int32 page_number = 2 [json_name = "pageNumber"];
+  optional int32 result_per_page = 3 [default = 10, json_name = "resultPerPage"];
+  optional .hello.world.Corpus corpus = 4 [default = CORPUS_UNIVERSAL, json_name = "corpus"];
+  optional bool field = 5 [default = true, json_name = "field"];
 }
 
 enum Corpus {
